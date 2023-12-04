@@ -1,6 +1,6 @@
 use std::fs;
 
-const INITIALS: [&str; 3] = ["jwc", "scb", "tmf"];
+const INITIALS: [&str; 4] = ["xmp", "jwc", "scb", "tmf"];
 
 fn read_input_file(day: u8, initials: &str) -> String {
     fs::read_to_string(format!("input/day{day}/{initials}.txt"))

@@ -28,8 +28,7 @@ fn part1(input: &str) -> u32 {
                 .neighbors(x, y, current_number.len())
                 .into_iter()
                 .any(|(x, y)| {
-                    let row = &grid.rows()[y];
-                    let char = row[x];
+                    let char = grid.char_at(x, y);
 
                     !(char.is_ascii_digit() || char == '.')
                 })
@@ -47,7 +46,94 @@ fn part1(input: &str) -> u32 {
 }
 
 fn part2(input: &str) -> u32 {
-    0
+    let grid: Grid = input.parse().expect("Grid parsing never fails.");
+
+    let gear_ratio_sum: u32 = grid
+        .iter()
+        .filter(|(_, char)| *char == '*')
+        .map(|((x, y), _)| {
+            let mut neighbors = grid.neighbors(x, y, 1);
+            neighbors.retain(|&(x, y)| grid.char_at(x, y).is_ascii_digit());
+
+            let mut part_number_coordinates = Vec::with_capacity(8);
+
+            let mut coordinates = (x, y.wrapping_sub(1));
+            if neighbors.contains(&coordinates) {
+                part_number_coordinates.push(coordinates);
+            } else {
+                coordinates = (x.wrapping_sub(1), y.wrapping_sub(1));
+                if neighbors.contains(&coordinates) {
+                    part_number_coordinates.push(coordinates);
+                }
+
+                coordinates = (x + 1, y.wrapping_sub(1));
+                if neighbors.contains(&coordinates) {
+                    part_number_coordinates.push(coordinates);
+                }
+            }
+
+            coordinates = (x, y + 1);
+            if neighbors.contains(&coordinates) {
+                part_number_coordinates.push(coordinates);
+            } else {
+                coordinates = (x.wrapping_sub(1), y + 1);
+                if neighbors.contains(&coordinates) {
+                    part_number_coordinates.push(coordinates);
+                }
+
+                coordinates = (x + 1, y + 1);
+                if neighbors.contains(&coordinates) {
+                    part_number_coordinates.push(coordinates);
+                }
+            }
+
+            coordinates = (x.wrapping_sub(1), y);
+            if neighbors.contains(&coordinates) {
+                part_number_coordinates.push(coordinates);
+            }
+            coordinates = (x + 1, y);
+            if neighbors.contains(&coordinates) {
+                part_number_coordinates.push(coordinates);
+            }
+
+            if part_number_coordinates.len() != 2 {
+                return 0;
+            }
+
+            let gear_ratio: u32 = part_number_coordinates
+                .into_iter()
+                .map(|(mut x, y)| {
+                    let mut part_number = String::from(grid.char_at(x, y));
+
+                    let start_x = x;
+
+                    while x > 0 && grid.char_at(x - 1, y).is_ascii_digit() {
+                        let char = grid.char_at(x - 1, y);
+                        part_number = format!("{char}{part_number}");
+
+                        x -= 1;
+                    }
+
+                    x = start_x;
+
+                    while x < grid.width() - 1 && grid.char_at(x + 1, y).is_ascii_digit() {
+                        let char = grid.char_at(x + 1, y);
+                        part_number.push(char);
+
+                        x += 1;
+                    }
+
+                    part_number
+                        .parse::<u32>()
+                        .expect("We only constructed `part_number` from ascii digits.")
+                })
+                .product();
+
+            gear_ratio
+        })
+        .sum();
+
+    gear_ratio_sum
 }
 
 mod grid {
@@ -73,6 +159,11 @@ mod grid {
     }
 
     impl Grid {
+        pub(crate) fn char_at(&self, x: usize, y: usize) -> char {
+            let row = &self.rows()[y];
+            row[x]
+        }
+
         pub(crate) fn height(&self) -> usize {
             self.rows.len()
         }
