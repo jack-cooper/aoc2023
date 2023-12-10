@@ -1,4 +1,7 @@
-use std::{ops::ControlFlow, str::FromStr};
+use std::{
+    ops::{ControlFlow, Range},
+    str::FromStr,
+};
 
 use aoc2023::solve_day;
 
@@ -12,6 +15,7 @@ struct Almanac {
     humidity_to_location: Vec<CategoryMap>,
     light_to_temperature: Vec<CategoryMap>,
     seeds: Vec<i64>,
+    seed_ranges: Vec<Range<i64>>,
     seed_to_soil: Vec<CategoryMap>,
     soil_to_fertilizer: Vec<CategoryMap>,
     temperature_to_humidity: Vec<CategoryMap>,
@@ -39,6 +43,17 @@ impl FromStr for Almanac {
             .expect("The seeds descriptor should contain a `:`");
 
         let seeds: Vec<i64> = seeds.trim_start().split(' ').flat_map(str::parse).collect();
+
+        almanac.seed_ranges = seeds
+            .chunks_exact(2)
+            .map(|seed_range| {
+                let &[range_start, range_len] = seed_range else {
+                    unreachable!();
+                };
+
+                range_start..(range_start + range_len)
+            })
+            .collect();
 
         almanac.seeds = seeds;
 
@@ -91,6 +106,37 @@ impl FromStr for Almanac {
 }
 
 impl Almanac {
+    fn location_to_seed(&self, location_value: i64) -> Option<i64> {
+        let humidity_value =
+            self.map_category_reverse(CategoryMappingReverse::LocationToHumidity, location_value);
+
+        let temperature_value = self.map_category_reverse(
+            CategoryMappingReverse::HumidityToTemperature,
+            humidity_value,
+        );
+
+        let light_value = self.map_category_reverse(
+            CategoryMappingReverse::TemperatureToLight,
+            temperature_value,
+        );
+
+        let water_value =
+            self.map_category_reverse(CategoryMappingReverse::LightToWater, light_value);
+
+        let fertilizer_value =
+            self.map_category_reverse(CategoryMappingReverse::WaterToFertilizer, water_value);
+
+        let soil_value =
+            self.map_category_reverse(CategoryMappingReverse::FertilizerToSoil, fertilizer_value);
+
+        let seed_value = self.map_category_reverse(CategoryMappingReverse::SoilToSeed, soil_value);
+
+        self.seed_ranges
+            .iter()
+            .any(|range| range.contains(&seed_value))
+            .then_some(seed_value)
+    }
+
     fn map_category(&self, mapping: CategoryMapping, source_values: &mut [i64]) {
         let category_map_list = match mapping {
             CategoryMapping::FertilizerToWater => &self.fertilizer_to_water,
@@ -104,7 +150,7 @@ impl Almanac {
 
         source_values.iter_mut().for_each(|source_value| {
             category_map_list.iter().try_for_each(|category_map| {
-                if category_map.contains(*source_value) {
+                if category_map.contains_source(*source_value) {
                     *source_value += category_map.offset;
                     ControlFlow::Break(())
                 } else {
@@ -112,6 +158,26 @@ impl Almanac {
                 }
             });
         });
+    }
+
+    fn map_category_reverse(&self, mapping: CategoryMappingReverse, source_value: i64) -> i64 {
+        let category_map_list = match mapping {
+            CategoryMappingReverse::FertilizerToSoil => &self.soil_to_fertilizer,
+            CategoryMappingReverse::HumidityToTemperature => &self.temperature_to_humidity,
+            CategoryMappingReverse::LightToWater => &self.water_to_light,
+            CategoryMappingReverse::LocationToHumidity => &self.humidity_to_location,
+            CategoryMappingReverse::SoilToSeed => &self.seed_to_soil,
+            CategoryMappingReverse::TemperatureToLight => &self.light_to_temperature,
+            CategoryMappingReverse::WaterToFertilizer => &self.fertilizer_to_water,
+        };
+
+        let mapped_value = category_map_list.iter().find_map(|category_map| {
+            category_map
+                .contains_dest(source_value)
+                .then_some(source_value - category_map.offset)
+        });
+
+        mapped_value.unwrap_or(source_value)
     }
 
     fn seeds_to_locations(&self) -> Vec<i64> {
@@ -130,7 +196,13 @@ impl Almanac {
 }
 
 impl CategoryMap {
-    fn contains(&self, source_value: i64) -> bool {
+    fn contains_dest(&self, source_value: i64) -> bool {
+        let range = (self.source_start + self.offset)..(self.source_start + self.offset + self.len);
+
+        range.contains(&source_value)
+    }
+
+    fn contains_source(&self, source_value: i64) -> bool {
         let range = self.source_start..(self.source_start + self.len);
 
         range.contains(&source_value)
@@ -147,6 +219,16 @@ enum CategoryMapping {
     WaterToLight,
 }
 
+enum CategoryMappingReverse {
+    FertilizerToSoil,
+    HumidityToTemperature,
+    LightToWater,
+    LocationToHumidity,
+    SoilToSeed,
+    TemperatureToLight,
+    WaterToFertilizer,
+}
+
 fn part1(input: &str) -> u32 {
     let almanac: Almanac = input.parse().expect("Parsing an almanac can't fail.");
 
@@ -161,7 +243,13 @@ fn part1(input: &str) -> u32 {
 }
 
 fn part2(input: &str) -> u32 {
-    let mut almanac: Almanac = input.parse().expect("Parsing an almanac can't fail.");
+    let almanac: Almanac = input.parse().expect("Parsing an almanac can't fail.");
 
-    0
+    (0..)
+        .find_map(|location_value| {
+            almanac
+                .location_to_seed(location_value)
+                .and(Some(location_value as u32))
+        })
+        .expect("`find_map` is being run on a range which is unbounded at the top.")
 }
