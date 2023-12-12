@@ -7,12 +7,12 @@ fn main() {
 }
 
 struct Game {
-    id: u32,
+    id: u64,
     hands: Vec<Hand>,
 }
 
 struct Hand {
-    cube_counts: HashMap<Color, u32>,
+    cube_counts: HashMap<Color, u64>,
 }
 
 #[derive(Clone, Copy, Eq, Hash, PartialEq)]
@@ -31,7 +31,7 @@ impl FromStr for Game {
             .expect("Game did not have a `:` character.");
 
         let id = id.replace("Game ", "");
-        let id: u32 = id.parse().expect("Game provided a non-numeric ID.");
+        let id: u64 = id.parse().expect("Game provided a non-numeric ID.");
 
         let hands = game.split(';');
 
@@ -42,7 +42,7 @@ impl FromStr for Game {
                     .split_once(' ')
                     .expect("A cube count was missing a space.");
 
-                let count: u32 = count.parse().expect("A non numeric count was given.");
+                let count: u64 = count.parse().expect("A non numeric count was given.");
                 let color: Color = color.parse().expect("An unrecognised color was found.");
 
                 (color, count)
@@ -58,8 +58,8 @@ impl FromStr for Game {
     }
 }
 
-impl FromIterator<(Color, u32)> for Hand {
-    fn from_iter<T: IntoIterator<Item = (Color, u32)>>(iter: T) -> Self {
+impl FromIterator<(Color, u64)> for Hand {
+    fn from_iter<T: IntoIterator<Item = (Color, u64)>>(iter: T) -> Self {
         Self {
             cube_counts: iter.into_iter().collect(),
         }
@@ -86,7 +86,7 @@ fn make_games(input: &str) -> impl Iterator<Item = Game> + '_ {
     })
 }
 
-fn part1(input: &str) -> u32 {
+fn part1(input: &str) -> u64 {
     make_games(input)
         .filter_map(|Game { id, hands }| {
             hands
@@ -101,7 +101,7 @@ fn part1(input: &str) -> u32 {
         .sum()
 }
 
-fn part2(input: &str) -> u32 {
+fn part2(input: &str) -> u64 {
     make_games(input)
         .map(|Game { hands, .. }| {
             let maxima = hands.iter().fold(
@@ -121,7 +121,7 @@ fn part2(input: &str) -> u32 {
                 },
             );
 
-            maxima.values().product::<u32>()
+            maxima.values().product::<u64>()
         })
         .sum()
 }

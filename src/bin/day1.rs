@@ -6,7 +6,7 @@ fn main() {
     solve_day(1, part1, part2);
 }
 
-fn part1(input: &str) -> u32 {
+fn part1(input: &str) -> u64 {
     input
         .trim()
         .lines()
@@ -21,7 +21,7 @@ fn part1(input: &str) -> u32 {
             );
 
             format!("{first}{last}")
-                .parse::<u32>()
+                .parse::<u64>()
                 .expect("We checked `char::is_numeric` above.")
         })
         .sum()
@@ -58,7 +58,7 @@ impl FromStr for Digit {
     }
 }
 
-impl From<Digit> for u32 {
+impl From<Digit> for u64 {
     fn from(value: Digit) -> Self {
         match value {
             Digit::One => 1,
@@ -74,7 +74,7 @@ impl From<Digit> for u32 {
     }
 }
 
-fn part2(input: &str) -> u32 {
+fn part2(input: &str) -> u64 {
     let valid_str_patterns = [
         "one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
     ];
@@ -96,7 +96,7 @@ fn part2(input: &str) -> u32 {
             let first_match = first_str_matches
                 .chain(first_digit_match)
                 .min_by_key(|(index, _)| *index)
-                .map(|(_, str)| match str.parse::<u32>() {
+                .map(|(_, str)| match str.parse::<u64>() {
                     Ok(integer) => integer,
                     Err(_) => str.parse::<Digit>().unwrap().into(),
                 })
@@ -105,7 +105,7 @@ fn part2(input: &str) -> u32 {
             let last_match = last_str_matches
                 .chain(last_digit_match)
                 .max_by_key(|(index, _)| *index)
-                .map(|(_, str)| match str.parse::<u32>() {
+                .map(|(_, str)| match str.parse::<u64>() {
                     Ok(integer) => integer,
                     Err(_) => str.parse::<Digit>().unwrap().into(),
                 })

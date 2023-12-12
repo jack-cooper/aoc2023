@@ -68,13 +68,13 @@ impl PartialOrd for Scratchcard {
 }
 
 impl Scratchcard {
-    fn score(&self) -> u32 {
+    fn score(&self) -> u64 {
         let winning_number_count = self.winning_number_count() as u32;
 
         if winning_number_count == 0 {
             0
         } else {
-            2_u32.pow(winning_number_count - 1)
+            2_u64.pow(winning_number_count - 1)
         }
     }
 
@@ -85,7 +85,7 @@ impl Scratchcard {
     }
 }
 
-fn part1(input: &str) -> u32 {
+fn part1(input: &str) -> u64 {
     input
         .lines()
         .flat_map(|scratchcard| scratchcard.parse())
@@ -93,13 +93,13 @@ fn part1(input: &str) -> u32 {
         .sum()
 }
 
-fn part2(input: &str) -> u32 {
+fn part2(input: &str) -> u64 {
     let scratchcards: Vec<Scratchcard> = input
         .lines()
         .flat_map(|scratchcard| scratchcard.parse())
         .collect();
 
-    let mut counts: Vec<u32> = vec![1; scratchcards.len()];
+    let mut counts: Vec<u64> = vec![1; scratchcards.len()];
 
     for (index, scratchcard) in scratchcards.into_iter().enumerate() {
         let winning_number_count = scratchcard.winning_number_count();

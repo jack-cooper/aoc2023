@@ -5,7 +5,7 @@ fn main() {
     solve_day(3, part1, part2);
 }
 
-fn part1(input: &str) -> u32 {
+fn part1(input: &str) -> u64 {
     let grid: Grid = input.parse().expect("Grid parsing never fails.");
 
     let mut part_number_sum = 0;
@@ -34,7 +34,7 @@ fn part1(input: &str) -> u32 {
                 })
             {
                 part_number_sum += current_number
-                    .parse::<u32>()
+                    .parse::<u64>()
                     .expect("We only add ascii digits to `current_number`.");
             }
 
@@ -45,10 +45,10 @@ fn part1(input: &str) -> u32 {
     part_number_sum
 }
 
-fn part2(input: &str) -> u32 {
+fn part2(input: &str) -> u64 {
     let grid: Grid = input.parse().expect("Grid parsing never fails.");
 
-    let gear_ratio_sum: u32 = grid
+    let gear_ratio_sum: u64 = grid
         .iter()
         .filter(|(_, char)| *char == '*')
         .map(|((x, y), _)| {
@@ -100,7 +100,7 @@ fn part2(input: &str) -> u32 {
                 return 0;
             }
 
-            let gear_ratio: u32 = part_number_coordinates
+            let gear_ratio: u64 = part_number_coordinates
                 .into_iter()
                 .map(|(mut x, y)| {
                     let mut part_number = String::from(grid.char_at(x, y));
@@ -124,7 +124,7 @@ fn part2(input: &str) -> u32 {
                     }
 
                     part_number
-                        .parse::<u32>()
+                        .parse::<u64>()
                         .expect("We only constructed `part_number` from ascii digits.")
                 })
                 .product();
