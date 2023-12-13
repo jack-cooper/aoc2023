@@ -3,7 +3,7 @@ use std::{collections::HashMap, str::FromStr};
 use aoc2023::solve_day;
 
 fn main() {
-    solve_day(7, part1, part2);
+    solve_day(7, part1, part1);
 }
 
 #[derive(Debug, Eq, PartialEq, PartialOrd, Ord)]
@@ -13,7 +13,7 @@ struct Hand {
     bid: u64,
 }
 
-#[derive(Debug, Eq, PartialEq, PartialOrd, Ord)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq, PartialOrd, Ord)]
 enum HandType {
     HighCard,
     Pair,
@@ -26,6 +26,7 @@ enum HandType {
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 enum Card {
+    Joker,
     Two, // m Fwenwick
     Three,
     Four,
@@ -35,7 +36,7 @@ enum Card {
     Eight,
     Nine,
     Ten,
-    Jack, // COOPER
+    // Uncomment this for part 1: Jack, // COOPER
     Queen,
     King,
     Ace,
@@ -87,11 +88,25 @@ impl FromStr for Hand {
             _ => unreachable!(),
         };
 
+        let joker_count = card_counts.get(&Card::Joker).copied().unwrap_or_default();
+
+        let wildcard_hand_type = match (hand_type, joker_count) {
+            (_, 0) | (HandType::FiveOfAKind, _) => hand_type,
+            (HandType::HighCard, 1) => HandType::Pair,
+            (HandType::Pair, _) => HandType::ThreeOfAKind,
+            (HandType::TwoPair, 1) => HandType::FullHouse,
+            (HandType::TwoPair, 2) => HandType::FourOfAKind,
+            (HandType::ThreeOfAKind, _) => HandType::FourOfAKind,
+            (HandType::FullHouse, _) | (HandType::FourOfAKind, _) => HandType::FiveOfAKind,
+            _ => unreachable!(),
+        };
+
         let bid: String = chars[6..].iter().collect();
         let bid: u64 = bid.parse().expect("A bid should be a valid u64.");
 
         Ok(Hand {
-            hand_type,
+            // Uncomment for part 1: hand_type,
+            hand_type: wildcard_hand_type,
             cards,
             bid,
         })
@@ -112,7 +127,8 @@ impl TryFrom<char> for Card {
             '8' => Ok(Self::Eight),
             '9' => Ok(Self::Nine),
             'T' => Ok(Self::Ten),
-            'J' => Ok(Self::Jack),
+            // Uncomment for part 1: 'J' => Ok(Self::Jack),
+            'J' => Ok(Self::Joker),
             'Q' => Ok(Self::Queen),
             'K' => Ok(Self::King),
             'A' => Ok(Self::Ace),
@@ -134,8 +150,4 @@ fn part1(input: &str) -> u64 {
 
             total_winnings + bid * rank
         })
-}
-
-fn part2(input: &str) -> u64 {
-    0
 }
