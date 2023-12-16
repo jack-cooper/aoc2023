@@ -22,7 +22,7 @@ pub fn solve_day(day: u8, part1: fn(&str) -> u64, part2: fn(&str) -> u64) {
     INITIALS.iter().for_each(|&initials| {
         let input = read_input_file(day, initials);
 
-        println!("{}: {}", initials.to_uppercase(), part2(&input),);
+        println!("{}: {}", initials.to_uppercase(), part2(&input));
     });
     println!("=====  End Part 2  =====");
 }
