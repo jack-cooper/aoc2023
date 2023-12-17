@@ -153,13 +153,13 @@ impl TryFrom<char> for Instruction {
     }
 }
 
-fn part1(input: &str) -> u64 {
+fn part1(input: &str) -> Result<u64, ()> {
     let map: Map = input.parse().expect("Badly formatted input was provided.");
 
-    map.steps_to_end()
+    Ok(map.steps_to_end())
 }
 
-fn part2(input: &str) -> u64 {
+fn part2(input: &str) -> Result<u64, ()> {
     let map: Map = input.parse().expect("Badly formatted input was provided.");
 
     let start_node_count = map
@@ -189,7 +189,7 @@ fn part2(input: &str) -> u64 {
 
             a * (b / gcd_euclidean(a, b))
         })
-        .expect("`start_indices` has a guaranteed non-zero length.")
+        .ok_or(())
 }
 
 fn gcd_euclidean(a: u64, b: u64) -> u64 {

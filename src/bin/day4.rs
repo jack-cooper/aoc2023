@@ -85,15 +85,15 @@ impl Scratchcard {
     }
 }
 
-fn part1(input: &str) -> u64 {
-    input
+fn part1(input: &str) -> Result<u64, ()> {
+    Ok(input
         .lines()
         .flat_map(|scratchcard| scratchcard.parse())
         .map(|scratchcard: Scratchcard| scratchcard.score())
-        .sum()
+        .sum())
 }
 
-fn part2(input: &str) -> u64 {
+fn part2(input: &str) -> Result<u64, ()> {
     let scratchcards: Vec<Scratchcard> = input
         .lines()
         .flat_map(|scratchcard| scratchcard.parse())
@@ -117,5 +117,5 @@ fn part2(input: &str) -> u64 {
             });
     }
 
-    counts.into_iter().sum()
+    Ok(counts.into_iter().sum())
 }

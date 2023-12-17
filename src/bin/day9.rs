@@ -17,10 +17,10 @@ fn construct_histories(input: &str) -> Vec<Vec<i32>> {
         .collect()
 }
 
-fn part1(input: &str) -> u64 {
+fn part1(input: &str) -> Result<u64, ()> {
     let histories = construct_histories(input);
 
-    histories
+    let next_value_sum = histories
         .iter()
         .map(|history| {
             let mut sequences: Vec<Vec<i32>> = vec![history.clone()];
@@ -64,13 +64,15 @@ fn part1(input: &str) -> u64 {
 
             sequences[0][history.len()]
         })
-        .sum::<i32>() as u64
+        .sum::<i32>() as u64;
+
+    Ok(next_value_sum)
 }
 
-fn part2(input: &str) -> u64 {
+fn part2(input: &str) -> Result<u64, ()> {
     let histories = construct_histories(input);
 
-    histories
+    let previous_value_sum = histories
         .iter()
         .map(|history| {
             let mut sequences: Vec<VecDeque<i32>> = vec![VecDeque::from(history.clone())];
@@ -115,5 +117,7 @@ fn part2(input: &str) -> u64 {
 
             sequences[0][0]
         })
-        .sum::<i32>() as u64
+        .sum::<i32>() as u64;
+
+    Ok(previous_value_sum)
 }

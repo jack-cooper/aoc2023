@@ -6,8 +6,8 @@ fn main() {
     solve_day(1, part1, part2);
 }
 
-fn part1(input: &str) -> u64 {
-    input
+fn part1(input: &str) -> Result<u64, ()> {
+    Ok(input
         .trim()
         .lines()
         .map(|line| {
@@ -24,7 +24,7 @@ fn part1(input: &str) -> u64 {
                 .parse::<u64>()
                 .expect("We checked `char::is_numeric` above.")
         })
-        .sum()
+        .sum())
 }
 
 enum Digit {
@@ -74,14 +74,14 @@ impl From<Digit> for u64 {
     }
 }
 
-fn part2(input: &str) -> u64 {
+fn part2(input: &str) -> Result<u64, ()> {
     let valid_str_patterns = [
         "one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
     ];
 
     let lines = input.trim().lines();
 
-    lines
+    Ok(lines
         .map(|line| {
             let first_str_matches = valid_str_patterns
                 .into_iter()
@@ -113,5 +113,5 @@ fn part2(input: &str) -> u64 {
 
             first_match * 10 + last_match
         })
-        .sum()
+        .sum())
 }

@@ -229,20 +229,19 @@ enum CategoryMappingReverse {
     WaterToFertilizer,
 }
 
-fn part1(input: &str) -> u64 {
+fn part1(input: &str) -> Result<u64, ()> {
     let almanac: Almanac = input.parse().expect("Parsing an almanac can't fail.");
 
     let locations_for_seeds = almanac.seeds_to_locations();
 
-    let min_location = locations_for_seeds
+    locations_for_seeds
         .into_iter()
         .min()
-        .expect("At least one location per seed will always be returned.");
-
-    min_location as u64
+        .map(|min_location| min_location as u64)
+        .ok_or(())
 }
 
-fn part2(input: &str) -> u64 {
+fn part2(input: &str) -> Result<u64, ()> {
     let almanac: Almanac = input.parse().expect("Parsing an almanac can't fail.");
 
     (0..)
@@ -251,5 +250,5 @@ fn part2(input: &str) -> u64 {
                 .location_to_seed(location_value)
                 .and(Some(location_value as u64))
         })
-        .expect("`find_map` is being run on a range which is unbounded at the top.")
+        .ok_or(())
 }

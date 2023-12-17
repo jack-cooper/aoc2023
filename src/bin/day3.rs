@@ -5,7 +5,7 @@ fn main() {
     solve_day(3, part1, part2);
 }
 
-fn part1(input: &str) -> u64 {
+fn part1(input: &str) -> Result<u64, ()> {
     let grid: Grid = input.parse().expect("Grid parsing never fails.");
 
     let mut part_number_sum = 0;
@@ -42,10 +42,10 @@ fn part1(input: &str) -> u64 {
         }
     });
 
-    part_number_sum
+    Ok(part_number_sum)
 }
 
-fn part2(input: &str) -> u64 {
+fn part2(input: &str) -> Result<u64, ()> {
     let grid: Grid = input.parse().expect("Grid parsing never fails.");
 
     let gear_ratio_sum: u64 = grid
@@ -133,7 +133,7 @@ fn part2(input: &str) -> u64 {
         })
         .sum();
 
-    gear_ratio_sum
+    Ok(gear_ratio_sum)
 }
 
 mod grid {

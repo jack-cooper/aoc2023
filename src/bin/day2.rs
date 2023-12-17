@@ -86,8 +86,8 @@ fn make_games(input: &str) -> impl Iterator<Item = Game> + '_ {
     })
 }
 
-fn part1(input: &str) -> u64 {
-    make_games(input)
+fn part1(input: &str) -> Result<u64, ()> {
+    Ok(make_games(input)
         .filter_map(|Game { id, hands }| {
             hands
                 .iter()
@@ -98,11 +98,11 @@ fn part1(input: &str) -> u64 {
                 })
                 .then_some(id)
         })
-        .sum()
+        .sum())
 }
 
-fn part2(input: &str) -> u64 {
-    make_games(input)
+fn part2(input: &str) -> Result<u64, ()> {
+    Ok(make_games(input)
         .map(|Game { hands, .. }| {
             let maxima = hands.iter().fold(
                 HashMap::from([(Color::Blue, 0), (Color::Green, 0), (Color::Red, 0)]),
@@ -123,5 +123,5 @@ fn part2(input: &str) -> u64 {
 
             maxima.values().product::<u64>()
         })
-        .sum()
+        .sum())
 }

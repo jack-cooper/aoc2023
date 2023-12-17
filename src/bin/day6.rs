@@ -100,17 +100,17 @@ impl BoatRace {
             .expect("A race record should always be beatable.")
     }
 }
-fn part1(input: &str) -> u64 {
+fn part1(input: &str) -> Result<u64, ()> {
     let boat_races: BoatRaces = input.parse().expect("Badly formatted input was provided.");
 
-    boat_races
+    Ok(boat_races
         .iter()
         .map(|race| (race.time + 1) - 2 * race.first_winning_time())
-        .product()
+        .product())
 }
 
-fn part2(input: &str) -> u64 {
+fn part2(input: &str) -> Result<u64, ()> {
     let race: BoatRace = input.parse().expect("Badly formatted input was provided.");
 
-    (race.time + 1) - 2 * race.first_winning_time()
+    Ok((race.time + 1) - 2 * race.first_winning_time())
 }

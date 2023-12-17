@@ -137,17 +137,17 @@ impl TryFrom<char> for Card {
     }
 }
 
-fn part1(input: &str) -> u64 {
+fn part1(input: &str) -> Result<u64, ()> {
     let mut hands: Vec<Hand> = input.lines().filter_map(|line| line.parse().ok()).collect();
 
     hands.sort_unstable();
 
-    hands
+    Ok(hands
         .into_iter()
         .enumerate()
         .fold(0_u64, |total_winnings, (index, Hand { bid, .. })| {
             let rank = index as u64 + 1;
 
             total_winnings + bid * rank
-        })
+        }))
 }
